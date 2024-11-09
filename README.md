@@ -117,7 +117,7 @@ print('Standard Deviation: ' ,std)
 ${\textsf{\color{blue}Output:}}$
 ![image](https://github.com/user-attachments/assets/d42a69f8-2d31-45e5-8de8-8376616e4f17)
 
-> _**Discussion**_ <br />
+> _**Analysis**_ <br />
 The average number of streams for the top songs was about 514 million, but the median was lower at 291 million, meaning while some songs were hugely popular, many others had more modest streaming numbers.
 
 
@@ -149,7 +149,7 @@ ax[1].set_ylabel("Frequency")
 
 ${\textsf{\color{blue}Output:}}$
 ![image](https://github.com/user-attachments/assets/fd7f7901-67c8-45c1-afed-1f332744261c)
-> _**Discussion**_ <br />
+> _**Analysis**_ <br />
 The histogram of _'Release Years'_ reveals that the majority of song were released in 2020, indicating a strong presence of recent music. Additionally, the histogram of _'Artist Count'_ shows that most of these songs feature a single artist. Tracks with more artists are less common, suggesting that collaborations are rarer than solo or duet.
 
 
@@ -168,11 +168,61 @@ top_5.loc[:,['track_name','artist(s)_name','streams']]
 ${\textsf{\color{blue}Output:}}$
 ![image](https://github.com/user-attachments/assets/2b2275c5-ac00-492e-ab01-acef884ae679)
 
-> _**Discussion**_ <br />
+> _**Analysis**_ <br />
 The data shows that _"Blinding Lights"_ by _The Weeknd_ is the most-streamed track of 2023, with 3.7 billion streams.
 
 
 #### Who are the top 5 most frequent artists based on the number of tracks in the dataset?
 ``` python
+# Split to convert individual artist names into a list
+artist = spotify_ds['artist(s)_name'].str.split(', ')
 
+# Breaks down lists of artists into individual rows, counts the frequency of each artist, and then displays the top 5 most common artists
+data = artist.explode().value_counts().head()
+
+# Convert to dataframe
+top5_artists = exploded_data.reset_index()
+top5_artists.columns = ['Artist', 'Track Count']
+top5_artists
+```
+
+${\textsf{\color{blue}Output:}}$
+![image](https://github.com/user-attachments/assets/dae9db38-af09-4e43-b63f-862aa2905ce5)
+
+> _**Analysis**_ <br />
+The analysis reveals that the top five most frequent artists in the dataset are led by Bad Bunny, with 40 tracks featured, followed by Taylor Swift with 38 tracks, The Weeknd with 37 tracks, and SZA and Kendrick Lamar, who both have 23 tracks featured.
+
+
+### <ins>Temporal Trends<ins>
+#### Analyze the trends in the number of tracks released over time. Plot the number of tracks released per year.
+``` python
+plt.figure(figsize=(11, 4))
+spotify_ds['released_year'].value_counts().sort_index().plot(kind='bar')
+plt.title('Number of Tracks Released Per Year')
+plt.xlabel('Year')
+plt.ylabel('Number of Tracks')
+plt.show()
+```
+
+${\textsf{\color{blue}Output:}}$
+![image](https://github.com/user-attachments/assets/bf38b013-4180-437e-be6b-4de2a145bd2c)
+
+> _**Analysis**_ <br />
+The graph shows that songs released in 2022 have the most tracks, followed by songs from 2023 and so on. This suggests that songs from the previous year have had more time to accumulate streams, while newer releases are still catching up.
+
+
+#### Does the number of tracks released per month follow any noticeable patterns? Which month sees the most releases?
+``` python
+plt.figure(figsize=(11, 4))
+spotify_ds['released_month'].value_counts().sort_index().plot(kind='bar')
+plt.title('Number of Tracks Released Per Month')
+plt.xlabel('Month')
+plt.ylabel('Number of Tracks')
+plt.show()
+```
+
+${\textsf{\color{blue}Output:}}$
+![image](https://github.com/user-attachments/assets/d92906e2-41e9-43e9-b822-a8589ff8194d)
+
+> _**Analysis**_ <br />
 
