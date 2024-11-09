@@ -19,7 +19,7 @@ This deliverable aims to:
 
 
 ## III. RESULTS AND DISCUSSION
-### A. Libraries
+### <ins>A. Libraries<ins>
 Before we dive into coding, we first need to import the necessary libraries that will assist in manipulating the data.
 ``` python
 import numpy as np
@@ -33,7 +33,7 @@ import seaborn as sns
 4. **Seaborn** - Importing `seaborn` for creating statistical plots, built on top of Matplotlib
 
 
-### B. Accessing the `.csv` file
+### <ins>B. Accessing the `.csv` file<ins>
 ``` python
 spotify_ds = pd.read_csv('spotify-2023.csv')
 spotify_ds
@@ -62,7 +62,7 @@ spotify_ds
 ```
 
 
-### C. Overview of Dataset
+### <ins>C. Overview of Dataset<ins>
 #### How many rows and columns does the dataset contain?
 > We could use the `.shape` command to get the dimensions of the dataset or data structure.
 ``` python
@@ -91,9 +91,10 @@ ${\textsf{\color{blue}Output:}}$
 
 
 
-### D. Basic Descriptive Statistics
+### <ins>D. Basic Descriptive Statistics<ins>
 #### What are the mean, median, and standard deviation of the streams column?
-> 
+> The `pd.to_numeric()` function converts each values in 'streams' to a numeric value. However, `NaN` is displayed if the value cannot be converted into a numerical value because of the `errors='coerce'` argument. <br /><br />
+When a column displays `NaN` value the line `spotify_ds = spotify_ds.dropna(subset=['streams'])` removes the rows where it is showned to ensure that only rows with numerical value is retained.
 
 ``` python
 # Convert 'streams' to numeric
@@ -103,9 +104,9 @@ spotify_ds['streams'] = pd.to_numeric(spotify_ds['streams'],errors='coerce')
 spotify_ds = spotify_ds.dropna(subset=['streams'])
 
 # Calculate mean, median, and standard deviation
-mean = spotify_ds['streams'].mean()
-median = spotify_ds['streams'].median()
-std = spotify_ds['streams'].std()
+mean = spotify_ds['streams'].mean() # .mean() is used to calculate the mean
+median = spotify_ds['streams'].median() # .median() is used to calculate the median
+std = spotify_ds['streams'].std() # .std() is used to calculate the standard deviation
 
 # Display the output
 print('Mean: ' ,mean)
@@ -116,5 +117,62 @@ print('Standard Deviation: ' ,std)
 ${\textsf{\color{blue}Output:}}$
 ![image](https://github.com/user-attachments/assets/d42a69f8-2d31-45e5-8de8-8376616e4f17)
 
+> _**Discussion**_ <br />
+The average number of streams for the top songs was about 514 million, but the median was lower at 291 million, meaning while some songs were hugely popular, many others had more modest streaming numbers.
+
+
+#### What is the distribution of released_year and artist_count? Are there any noticeable trends or outliers?
+
+``` python
+# Convert 'artist_count' and 'released_year' columns to numeric
+spotify_ds['artist_count'] = pd.to_numeric(spotify_ds['artist_count'], errors='coerce')
+spotify_ds['released_year'] = pd.to_numeric(spotify_ds['released_year'], errors='coerce')
+
+# Remove non-numeric rows
+spotify_ds = spotify_ds.dropna(subset=['released_year', 'artist_count'])
+
+# Create a figure with two subplots side by side
+fig, ax = plt.subplots(1, 2, figsize=(10, 4))
+
+# Plot
+sns.histplot(spotify_ds['released_year'], bins=20, kde=True, ax=ax[0])
+ax[0].set_title("Distribution of Released Year")
+ax[0].set_xlabel("Release Year")
+axes[0].set_ylabel("Frequency")
+
+# Plot
+sns.histplot(spotify_ds['artist_count'], bins=10, kde=True, ax=ax[1])
+ax[1].set_title("Distribution of Artist Count")
+ax[1].set_xlabel("Artist Count")
+ax[1].set_ylabel("Frequency")
+```
+
+${\textsf{\color{blue}Output:}}$
+![image](https://github.com/user-attachments/assets/fd7f7901-67c8-45c1-afed-1f332744261c)
+> _**Discussion**_ <br />
+The histogram of _'Release Years'_ reveals that the majority of song were released in 2020, indicating a strong presence of recent music. Additionally, the histogram of _'Artist Count'_ shows that most of these songs feature a single artist. Tracks with more artists are less common, suggesting that collaborations are rarer than solo or duet.
+
+
+### <ins>Top Performers<ins>
+#### Which track has the highest number of streams? Display the top 5 most streamed tracks.
+
+``` python
+# Sort from highest to lowest
+sort = spotify_ds.sort_values(by='streams', ascending=False)
+
+# Display the top 5 most streamed tracks
+top_5 = sort.head()
+top_5.loc[:,['track_name','artist(s)_name','streams']]
+```
+
+${\textsf{\color{blue}Output:}}$
+![image](https://github.com/user-attachments/assets/2b2275c5-ac00-492e-ab01-acef884ae679)
+
+> _**Discussion**_ <br />
+The data shows that _"Blinding Lights"_ by _The Weeknd_ is the most-streamed track of 2023, with 3.7 billion streams.
+
+
+#### Who are the top 5 most frequent artists based on the number of tracks in the dataset?
+``` python
 
 
