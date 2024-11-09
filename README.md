@@ -1,7 +1,7 @@
 <h1 align="center">Python - Exploratory Data Analysis on Spotify 2023 Dataset</h1>
 <p align="center">
 
-## I. BACKGROUND
+## BACKGROUND
 ### What is EDA?
 The objective of exploratory data analysis (also known as EDA) is to become familiar with the data by exploring deeply to examine and interpret the information we have. EDA allows us to examine, summarize, and analyze the dataset using Python libraries, which helps us identify patterns, trends, and the relationships between various data points.
 
@@ -9,7 +9,7 @@ The objective of exploratory data analysis (also known as EDA) is to become fami
 The dataset titled "Most Streamed Spotify Songs 2023," which is accessible on [Kaggle](https://www.kaggle.com/datasets/nelgiriyewithana/top-spotify-songs-2023), will be examined in this deliverable. Track names, artist names, release dates, Spotify playlists and charts, streaming data, the existence of Apple Music and Deezer, Shazam charts, and other audio characteristics are all included in this dataset.
 
 
-## II. OBJECTIVES
+## OBJECTIVES
 This deliverable aims to:
 1. Understand the dataset structure, check for missing values, and examine the data types.
 2. Create a summarized statistics of key metrics such as stream counts, release dates, and musical attributes (e.g., BPM, danceability).
@@ -18,7 +18,7 @@ This deliverable aims to:
 5. Provide insights and recommendations.
 
 
-## III. RESULTS AND DISCUSSION
+## RESULTS AND DISCUSSION
 ### <ins>A. Libraries<ins>
 Before we dive into coding, we first need to import the necessary libraries that will assist in manipulating the data.
 ``` python
@@ -225,4 +225,107 @@ ${\textsf{\color{blue}Output:}}$
 ![image](https://github.com/user-attachments/assets/d92906e2-41e9-43e9-b822-a8589ff8194d)
 
 > _**Analysis**_ <br />
+The graph reveals that January has the highest number of track releases, with May following closely behind. The concentration of releases in January could be a deliberate strategy by artists and labels, as songs launched early in the year have a greater opportunity to gather listeners over time. This extended period of exposure means these tracks can maintain or even increase their popularity as the year progresses, helping them stay relevant throughout the months.
 
+
+### <ins>Genre and Music Characteristics<ins>
+#### Examine the correlation between streams and musical attributes like bpm, danceability_%, and energy_%. Which attributes seem to influence streams the most?
+``` python
+# Convert columns to numeric
+col = ['streams', 'bpm', 'danceability_%', 'valence_%', 'energy_%', 'acousticness_%', 'instrumentalness_%', 'liveness_%', 'speechiness_%']
+for col in col:
+    spotify_ds[col] = pd.to_numeric(spotify_ds[col], errors='coerce')
+    
+# Correlation between streams and musical attributes
+corr = spotify_ds[['streams', 'bpm', 'danceability_%', 'valence_%', 'energy_%', 'acousticness_%', 'instrumentalness_%', 'liveness_%', 'speechiness_%']].corr()
+
+# Heat map
+plt.figure(figsize=(10, 4))
+sns.heatmap(corr, annot=True, cmap='coolwarm', center=0)
+plt.title('Correlation Between Streams and Musical Attributes')
+plt.xticks(rotation=45)
+plt.show()
+```
+
+${\textsf{\color{blue}Output:}}$
+![image](https://github.com/user-attachments/assets/9e2411c6-e7f3-4051-a529-0ac9ff265e26)
+
+
+#### Is there a correlation between danceability_% and energy_%? How about valence_% and acousticness_%?
+``` python
+dnc_enr = correlation.loc['danceability_%', 'energy_%']
+val_acou = correlation.loc['valence_%', 'acousticness_%']
+
+print(f"Correlation Between Danceability and Energy: {dnc_enr:.2f}")
+print(f"Correlation Between Valence and Acousticness: {val_acou:.2f}")
+```
+
+${\textsf{\color{blue}Output:}}$
+![image](https://github.com/user-attachments/assets/611b44b7-a3df-4316-8fa5-9ae08161d81b)
+> _**Analysis**_ <br />
+The heatmap analysis of the dataset reveals that there is no strong relationship between the number of streams and other musical attributes. This suggests that no single musical characteristic can fully explain a song’s streaming popularity. Popular songs appear to depend on a combination of factors, rather than being influenced by one specific attribute. However, a few relationships do stand out. For instance, "danceability" and "valence" show a moderate positive correlation, meaning that songs that are more danceable tend to have a more positive mood or tone. Similarly, "energy" and "valence" also show a moderate positive correlation, suggesting that songs with higher energy levels often have a more upbeat or positive feel. On the other hand, "energy" and "acousticness" show the weakest correlation among the attributes, with a moderate negative relationship. This indicates that songs with higher acousticness tend to have less energy, and vice versa. Further, danceability and energy reveals to have a weak positive correlation, suggesting that more danceable songs also tend to have higher energy levels, creating an intense and active vibe. Meanwhile, "valence" and "acousticness" have a weak negative correlation, showing that more positive songs tend to have lower acousticness, though this relationship is not strong enough to be considered a rule. Lastly, the relationship between "energy" and "acousticness" has a moderate negative correlation, with a value of -0.08, emphasizing the contrast between songs with high energy and those with a more acoustic or mellow sound. These findings highlight that, while individual musical traits play a role in a song's popularity, no single factor dominates.
+
+
+### <ins>Platform Popularity<ins>
+#### How do the numbers of tracks in spotify_playlists, spotify_charts, and apple_playlists compare? Which platform seems to favor the most popular tracks?
+``` python
+spotify_playlists = spotify_ds['in_spotify_playlists'].mean()
+spotify_charts = spotify_ds['in_spotify_charts'].mean()
+apple_playlists = spotify_ds['in_apple_playlists'].mean()
+
+platforms = [spotify_playlists, spotify_charts, apple_playlists]
+labels = ['Spotify Playlists', 'Spotify Charts', 'Apple Playlists']
+
+plt.figure(figsize=(6, 4))
+plt.bar(labels, platforms)
+plt.ylabel('Average Number')
+plt.title('Tracks in Spotify Playlist and Charts and Apple Playlists')
+plt.show()
+```
+
+${\textsf{\color{blue}Output:}}$
+![image](https://github.com/user-attachments/assets/2b4aca78-0431-48ca-b443-827b9ecb137f)
+> _**Analysis**_ <br />
+This bar graph shows a big difference in the average number of tracks between Spotify Playlists, Spotify Charts, and Apple Playlists. Spotify Playlists have a much higher number of tracks compared to the other two. In fact, Spotify Charts and Apple Playlists have so few tracks on average that their bars are barely visible next to the Spotify Playlists bar. This means that Spotify Playlists usually offer a much larger variety of songs, while Spotify Charts and Apple Playlists have a fewer selection.
+
+
+### Advanced Analysis
+#### Based on the streams data, can you identify any patterns among tracks with the same key or mode (Major vs. Minor)?
+``` python
+ave_streams = spotify_ds.groupby('key')['streams'].mean().sort_values(ascending=False).reset_index()
+ave_streams.columns = ['Key', 'Average Streams']
+print("Average Streams by Key:")
+display(ave_streams)
+```
+
+${\textsf{\color{blue}Output:}}$
+![image](https://github.com/user-attachments/assets/e5c29211-f233-45ec-8319-df2e489a3bd5)
+> _**Analysis**_ <br />
+The key with the highest average streams by key is C# with approximately 604 million, followed closely by E which is about 577 million and D# which is about 553 million. The keys with the lowest average streams are G (about 452 million) and A (about 409 million). This suggests that songs in certain keys, like C# and E, tend to perform better in terms of streams, while keys like G and A may be less popular among listeners.
+
+#### Do certain genres or artists consistently appear in more playlists or charts? Perform an analysis to compare the most frequently appearing artists in playlists or charts.
+``` python
+pltfrm = ['in_spotify_playlists', 'in_spotify_charts', 'in_apple_playlists', 'in_apple_charts', 'in_deezer_playlists', 'in_deezer_charts']
+artists = spotify_ds.groupby("artist(s)_name")[pltfrm].sum().sum(axis=1).sort_values(ascending=False)
+
+top_15 = artists.head(15).reset_index()
+top_15.columns = ['Artist', 'Number of Appearances']
+
+plt.figure(figsize = (12, 6))
+sns.barplot(data = top_15, x = 'Number of Appearances', y = 'Artist', dodge = False, legend = False)
+plt.title('Top 15 Most Frequently Appearing Artists', fontsize = 20)
+plt.xlabel('Number of Appearances', fontsize = 12)
+plt.ylabel('Artist', fontsize = 12)
+plt.grid(axis = 'x', linestyle = '--', alpha = 0)
+plt.show()
+```
+
+${\textsf{\color{blue}Output:}}$
+![image](https://github.com/user-attachments/assets/0ce82629-5bd0-499f-927c-30c0ab0a78c2)
+> _**Analysis**_ <br />
+The Weeknd leads in appearances, with Ed Sheeran and Taylor Swift following closely behind. This suggests that users often add The Weeknd's music to their playlists, showing that his songs are popular and frequently chosen by listeners.
+
+## AUTHOR
+Angeline Jeannah E. Arao
+- [GitHub](https://github.com/araogabi)
+- [Facebook](https://www.facebook.com/araoangeline?mibextid=LQQJ4d)
