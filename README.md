@@ -27,8 +27,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 ```
-1. **Import Numpy** - Importing `numpy` for numerical computations and array manipulation
-2. **Import Pandas** - Importing `pandas` for data structure manipulations and operations
+1. **Numpy** - Importing `numpy` for numerical computations and array manipulation
+2. **Pandas** - Importing `pandas` for data structure manipulations and operations
 3. **Matplotlib** - Importing `matplotlib.pyplot` for visualization
 4. **Seaborn** - Importing `seaborn` for creating statistical plots, built on top of Matplotlib
 
